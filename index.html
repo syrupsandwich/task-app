@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Task App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="./task-app.js"></script>
+    <script src="./show-table.js"></script>
+    <link href="./index.css" type="text/css" rel="stylesheet">
+    <script>
+      console.log(`${parseLocalStorage() ? 'U': 'No u'}ser data has been found in browser local storage.`);
+    </script>
+  </head>
+  <body>
+    <h3>the program is currently only accessible through the browser console.</h3>
+    <table id="functions-table">
+      <caption>here is a list of functions to be used directly. those with a priority of 1 are the ones I think are most important and essential.</caption>
+      <tr>
+        <th>function name</th>
+        <th>description</th>
+        <th>priority</th>
+      </tr>
+      <tr>
+        <td>writeTask</td>
+        <td>a simplified way to create a task object</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>showTable</td>
+        <td>displays tasks in an organized table in the browser console</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>saveData*</td>
+        <td>saves user data to the browser's local storage</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>removeTasks</td>
+        <td>removes the corresponding task for each task id provided</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasks</td>
+        <td>returns the corresponding task object for each task id provided</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>markTasksAsCompleted</td>
+        <td>sets the isCompleted property to true or false for each task provided</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasksWithStatus</td>
+        <td>returns an array of task objects with the status property value of either -1(overdue), 0(pending), or 1(completed)</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>sortTasksByStatus</td>
+        <td>returns a copy of a provided array of task objects, sorted based on their status property value</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasksWithWords</td>
+        <td>returns an array of task objects which contain the terms provided</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasksWithTags</td>
+        <td>returns an array of task objects which contain all of the terms provided</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasksByDueDate</td>
+        <td>returns an array of task objects which are due within the date range provided</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>sortTasksByDueDate</td>
+        <td>returns a copy of a provided array of task objects, sorted based on the date a task is due</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>Task.prototype.require</td>
+        <td>stores ids of tasks that should be completed prior to the selected task without duplicating pre-existing entries</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>sortTasksByTags</td>
+        <td>returns a copy of a provided array of task objects, sorted based on the amount of tags that match the terms provided</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>sortTasksByStartDate</td>
+        <td>returns a copy of a provided array of task objects, sorted based on date of task creation</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>getTasksByStartDate</td>
+        <td>returns an array of task objects which were created within the date range provided</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>getTasksWithNoTags</td>
+        <td>returns an array of task objects which contain an empty tags array</td>
+        <td>4</td>
+      </tr>
+    </table>
+    <p>*data not saved will be lost after a page refresh or when leaving the page.</p>
+    <main>
+    </main>
+    <footer></footer>
+  </body>
+</html>

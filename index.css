@@ -1,0 +1,27 @@
+html{
+  background-color: hsl(200, 60%, 10%);
+  color: hsl(280, 40%, 90%);
+  font-family: monospace;
+}
+#functions-table{
+  width: fit-content;
+}
+#functions-table{
+  border-collapse: collapse;
+}
+#functions-table td,
+#functions-table th{
+  border: 1px solid hsl(0, 0%, 60%);
+  padding: 0.5ch 1ch;
+}
+#functions-table th{
+  text-align: left;
+}
+#functions-table td:last-child,
+#functions-table th:last-child{
+  text-align: center;
+}
+#functions-table caption{
+  text-align: left;
+  padding-bottom: 1ch;
+}

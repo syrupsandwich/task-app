@@ -1,0 +1,20 @@
+imperative constructs from task-app-core.js
+tasks
+Task
+writeTask
+showTable
+writeToStorage
+removeTasks
+getTasks
+markTaskAsCompleted
+unmarkTaskAsCompleted
+getTasksWithStatus
+sortTasksByStatus
+getTasksWithWords
+getTasksWithTags
+getTasksByDueDate
+
+less important constructs:
+sortTasksByTags         sortTasksByStartDate
+sortTasksByDueDate      getTasksWithWordsInTitle
+getTasksWithNoTags      getTasksByStartDate
