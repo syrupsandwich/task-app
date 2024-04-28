@@ -5,10 +5,13 @@
     <title>Task App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="./task-app.js"></script>
+    <script src="./estimate-quota-usage.js"></script>
     <script src="./show-table.js"></script>
     <link href="./index.css" type="text/css" rel="stylesheet">
     <script>
-      console.log(`${parseLocalStorage() ? 'U': 'No u'}ser data has been found in browser local storage.`);
+      parseLocalStorageArray('tasks');
+      parseLocalStorageArray('records');
+      console.log(`${tasks.length > 0 || records.length > 0 ? 'U': 'No u'}ser data has been found localStorage.`);
     </script>
   </head>
   <body>
@@ -23,7 +26,7 @@
       </tr>
       <tr>
         <td>writeTask</td>
-        <td>object: { title, description, dueDate, tags }</td>
+        <td>object: { title, details, dueDate, tags }</td>
         <td>creates a task object and pushes it into the tasks array</td>
         <td>1</td>
       </tr>
@@ -47,8 +50,8 @@
       </tr>
       <tr>
         <td>getTasks</td>
-        <td>ids</td>
-        <td>returns a task object for each id's corresponding task</td>
+        <td>ids, array</td>
+        <td>returns a task object for each id's corresponding task from an array</td>
         <td>1</td>
       </tr>
       <tr>
@@ -59,7 +62,7 @@
       </tr>
       <tr>
         <td>getTasksWithStatus</td>
-        <td>num: [ -1 || 0 || 1 ], array</td>
+        <td>num: ( -1 || 0 || 1 ), array</td>
         <td>returns an array of task objects with the status property value of -1, 0, or 1</td>
         <td>1</td>
       </tr>
@@ -85,6 +88,12 @@
         <td>getTasksByDueDate</td>
         <td>dateRange, array</td>
         <td>returns an array of task objects which are due within the date range provided</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>archiveTasks</td>
+        <td>array</td>
+        <td>moves array entries from tasks to records</td>
         <td>1</td>
       </tr>
       <tr>
@@ -131,8 +140,5 @@
       <li>the get and sort functions have an array argument so that the return value of one can be passed to another</li>
       <li>data is not saved automatically. data that is not saved will be lost after a page refresh or when leaving the page.</li>
     </ul>
-    <main>
-    </main>
-    <footer></footer>
   </body>
 </html>

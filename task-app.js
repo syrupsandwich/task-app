@@ -1,4 +1,6 @@
 window.tasks = [];
+window.records = [];
+
 let tasks = window.tasks;
 
 let counter = (function () {
@@ -9,12 +11,12 @@ let counter = (function () {
   return { increment };
 })();
 
-/* exported parseLocalStorage */
-function parseLocalStorage() {
-  if (Object.hasOwn(localStorage, "tasks")) {
-    let tempObjects = JSON.parse(localStorage.getItem("tasks"));
+/* exported parseLocalStorageArray */
+function parseLocalStorageArray(key) {
+  if (Object.hasOwn(localStorage, key)) {
+    let tempObjects = JSON.parse(localStorage.getItem(key));
     tempObjects.forEach((object) => {
-      tasks.push(new Task(object));
+      window[key].push(new Task(object));
     });
     return true;
   } else {
@@ -111,25 +113,31 @@ Task.prototype.getStatus = function () {
 };
 
 Task.prototype.getText = function (properties) {
-  let text = '';
-  for(let property of properties){
-    if(Object.hasOwn(this, property) === false ){ continue };
-    if(this[property === undefined]){ continue };
-    if(text !== ''){ text = text.concat('\n')};
+  let text = "";
+  for (let property of properties) {
+    if (Object.hasOwn(this, property) === false) {
+      continue;
+    }
+    if (this[property === undefined]) {
+      continue;
+    }
+    if (text !== "") {
+      text = text.concat("\n");
+    }
     text = text.concat(this[property]);
   }
   return text;
 };
 
-Task.prototype.require = function(ids){
-  ids.forEach(id=>{
-    if(this.requiredTaskIds.some((num) => num === id)){
+Task.prototype.require = function (ids) {
+  ids.forEach((id) => {
+    if (this.requiredTaskIds.some((num) => num === id)) {
       return;
     } else {
       this.requiredTaskIds.push(id);
     }
-  })
-}
+  });
+};
 
 /* exported writeTask */
 function writeTask(object) {
@@ -156,24 +164,26 @@ function getTasksWithTags(strings, array = tasks) {
   return searchResults;
 }
 
-function getTasks(ids) {
+function getTasks(ids, array = tasks) {
   let list = [];
-  ids.forEach(id=>{
-  let task = tasks.find((task) => {
-    if (task.id === id) {
-      return true;
+  ids.forEach((id) => {
+    let task = array.find((task) => {
+      if (task.id === id) {
+        return true;
+      }
+    });
+    if (task !== undefined) {
+      list.push(task);
     }
-  });
-    if(task !== undefined ){ list.push(task) }
   });
   return list;
 }
 
 /* exported markTasksAsComplete */
-function markTasksAsComplete(ids, isComplete = true){
-  ids.forEach(id=>{
+function markTasksAsComplete(ids, isComplete = true) {
+  ids.forEach((id) => {
     let task = getTasks([id])[0];
-    if(isComplete){
+    if (isComplete) {
       task.isComplete = true;
       task.endDate = getCurrentDate();
       return;
@@ -181,8 +191,8 @@ function markTasksAsComplete(ids, isComplete = true){
       task.isComplete = false;
       delete task.endDate;
       return;
-    } 
-  })
+    }
+  });
 }
 
 /* exported sortTasksByTags */
@@ -249,10 +259,10 @@ function getTasksWithNoTags(array = tasks) {
 /* exported getTasksWithText */
 function getTasksWithText(strings, array = tasks) {
   let results = array.filter((task) => {
-    let string = task.getText(['title', 'description', 'tags']);
+    let string = task.getText(["title", "description", "tags"]);
     let score = 0;
-    strings.forEach((string) => {
-      if (string.toLowerCase().includes(string)) {
+    strings.forEach((pattern) => {
+      if (string.toLowerCase().includes(pattern)) {
         score++;
       }
     });
@@ -294,18 +304,22 @@ function getTasksByStartDate(dateRange, array = tasks) {
 /* exported removeTasks */
 function removeTasks(ids) {
   let list = [];
-  ids.forEach(id=>{
-  let index = tasks.findIndex((task) => {
-    return task.id === id;
-  });
-  list.push(tasks.splice(index, 1)[0]);
+  ids.forEach((id) => {
+    let index = tasks.findIndex((task) => {
+      return task.id === id;
+    });
+    list.push(tasks.splice(index, 1)[0]);
   });
   return list;
 }
 
 /* exported saveData */
 function saveData() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
+  localStorage.setItem("tasks", JSON.stringify(tasks, minimalTaskObjKeys));
+  localStorage.setItem(
+    "records",
+    JSON.stringify(window.records, minimalTaskObjKeys),
+  );
 }
 
 function getTasksWithStatus(num, array = tasks) {
@@ -320,4 +334,24 @@ function sortTasksByStatus(array) {
   let pending = getTasksWithStatus(0, array);
   let complete = getTasksWithStatus(1, array);
   return [].concat(overdue, pending, complete);
+}
+
+let minimalTaskObjKeys = [
+  "id",
+  "title",
+  "details",
+  "dueDate",
+  "startDate",
+  "endDate",
+  "tags",
+  "isComplete",
+  "requiredTaskIds",
+];
+
+/* exported archiveTasks */
+function archiveTasks(array) {
+  array.forEach((task) => {
+    let removedTask = removeTasks([task.id])[0];
+    window.records.push(removedTask);
+  });
 }
