@@ -28,7 +28,7 @@ function getCurrentDate() {
   let date = new Date();
   let year = date.getFullYear();
   let month = `${date.getMonth() + 1}`.padStart(2, "0");
-  let dayOfMonth = date.getDate();
+  let dayOfMonth = `${date.getDate()}`.padStart(2, "0");
   let string = `${year}-${month}-${dayOfMonth}`;
   return string;
 }
@@ -302,13 +302,13 @@ function getTasksByStartDate(dateRange, array = tasks) {
 }
 
 /* exported removeTasks */
-function removeTasks(ids) {
+function removeTasks(ids, array) {
   let list = [];
   ids.forEach((id) => {
-    let index = tasks.findIndex((task) => {
+    let index = array.findIndex((task) => {
       return task.id === id;
     });
-    list.push(tasks.splice(index, 1)[0]);
+    list.push(array.splice(index, 1)[0]);
   });
   return list;
 }

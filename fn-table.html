@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Fn Table</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="./task-app.js"></script>
+    <script src="./estimate-quota-usage.js"></script>
+    <script src="./show-table.js"></script>
+    <link href="./fn-table.css" type="text/css" rel="stylesheet">
+    <script>
+      parseLocalStorageArray('tasks');
+      parseLocalStorageArray('records');
+      console.log(`${tasks.length > 0 || records.length > 0 ? 'U': 'No u'}ser data has been found localStorage.`);
+    </script>
+  </head>
+  <body>
+    <h3>The graphical user interface for this program is in development. see it <a href="https://syrupsandwich.github.io/task-app/">here</a></h3>
+    <table id="functions-table">
+      <caption>here is a list of functions to be used directly. those with a priority of 1 are the ones I think are most important and essential.</caption>
+      <tr>
+        <th>function name</th>
+        <th>arguments</th>
+        <th>description</th>
+        <th>priority</th>
+      </tr>
+      <tr>
+        <td>writeTask</td>
+        <td>object: { title, details, dueDate, tags }</td>
+        <td>creates a task object and pushes it into the tasks array</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>showTable</td>
+        <td>array, sortFn = sortTasksByStatus</td>
+        <td>displays tasks in an organized table in the browser console</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>saveData</td>
+        <td></td>
+        <td>saves user data to the browser's local storage</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>removeTasks</td>
+        <td>ids, array</td>
+        <td>removes the task of each id's corresponding task from an array of task objects and returns the removed tasks</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasks</td>
+        <td>ids, array</td>
+        <td>returns a task object for each id's corresponding task from an array</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>markTasksAsCompleted</td>
+        <td>ids, isComplete</td>
+        <td>sets the isCompleted property to true(default) or false for each id's corresponding task</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasksWithStatus</td>
+        <td>num: ( -1 || 0 || 1 ), array</td>
+        <td>returns an array of task objects with the status property value of -1, 0, or 1</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>sortTasksByStatus</td>
+        <td>array</td>
+        <td>returns an array sorted in the following order: overdue, pending, completed</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasksWithText</td>
+        <td>strings, array</td>
+        <td>returns an array of task objects which include all the strings within the title, description, or tags</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasksWithTags</td>
+        <td>strings, array</td>
+        <td>returns an array of task objects which contain every string as a tag</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>getTasksByDueDate</td>
+        <td>dateRange, array</td>
+        <td>returns an array of task objects which are due within the date range provided</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>archiveTasks</td>
+        <td>array</td>
+        <td>moves array entries from tasks to records</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>sortTasksByDueDate</td>
+        <td>array, chronological</td>
+        <td>returns an array sorted based on the date a task is due</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>Task.prototype.require</td>
+        <td>ids</td>
+        <td>stores ids of tasks that should be completed prior to the selected task without duplicating pre-existing entries</td>
+        <td>2</td>
+      </tr>
+      <tr>
+        <td>sortTasksByTags</td>
+        <td>strings, array</td>
+        <td>returns an array sorted based on the amount of tags that match the strings</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>sortTasksByStartDate</td>
+        <td>array, chronological</td>
+        <td>returns an array sorted based on date of task creation</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>getTasksByStartDate</td>
+        <td>dateRange, array</td>
+        <td>returns an array of task objects which were created within the date range provided</td>
+        <td>3</td>
+      </tr>
+      <tr>
+        <td>getTasksWithNoTags</td>
+        <td>array</td>
+        <td>returns an array of task objects which contain no tags</td>
+        <td>4</td>
+      </tr>
+    </table>
+    <h4>notes</h4>
+    <ul>
+      <li>all task objects are stored in a single tasks array</li>
+      <li>the array argument for all getTask-functions defaults to the tasks array</li>
+      <li>the get and sort functions have an array argument so that the return value of one can be passed to another</li>
+      <li>data is not saved automatically. data that is not saved will be lost after a page refresh or when leaving the page.</li>
+    </ul>
+  </body>
+</html>
