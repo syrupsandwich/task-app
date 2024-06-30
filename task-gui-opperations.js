@@ -37,11 +37,11 @@ function makeTaskNode(object, displayContents = false) {
 
   let dueDateWarning = clone.querySelector(".due-date-none");
   let taskDueDate = clone.querySelector(".task-due-date");
-  if (object.dueDate === undefined) {
+  if (object["due date"] === undefined) {
     taskDueDate.parentElement.classList.add("hidden");
     dueDateWarning.classList.remove("hidden");
   } else {
-    taskDueDate.textContent = object.dueDate;
+    taskDueDate.textContent = object["due date"];
     dueDateWarning.classList.add("hidden");
   }
 
@@ -70,7 +70,7 @@ function makeTaskNode(object, displayContents = false) {
 
   let markCompleteBtn = clone.querySelector("button.mark-complete");
   markCompleteBtn.addEventListener("click", () => {
-    object.isComplete = true;
+    window.markTasksAsComplete([object.id], true);
     window.saveData();
     updateStorageQuotaText();
     clone.classList.remove("overdue");
@@ -95,7 +95,7 @@ function makeTaskNode(object, displayContents = false) {
 
   let markIncompleteBtn = clone.querySelector("button.mark-incomplete");
   markIncompleteBtn.addEventListener("click", () => {
-    object.isComplete = false;
+    window.markTasksAsComplete([object.id], false);
     window.saveData();
     updateStorageQuotaText();
     clone.classList.remove("complete");
@@ -128,6 +128,7 @@ function makeTaskNode(object, displayContents = false) {
   return clone;
 }
 
+/*exported makeTaskNodeArray*/
 function makeTaskNodeArray(taskArray) {
   let nodes = [];
   taskArray.forEach((task) => {
@@ -135,32 +136,6 @@ function makeTaskNodeArray(taskArray) {
   });
   return nodes;
 }
-
-let pendingTab = document.querySelector("button#pending");
-pendingTab.addEventListener("click", () => {
-  let overdueTasks = window.getTasksWithStatus(-1);
-  let sortedOverdueTasks = window.sortTasksByDueDate(overdueTasks);
-  let overdueTaskNodes = makeTaskNodeArray(sortedOverdueTasks);
-  let pendingTasks = window.getTasksWithStatus(0);
-  let sortedPendingTasks = window.sortTasksByDueDate(pendingTasks);
-  let pendingTaskNodes = makeTaskNodeArray(sortedPendingTasks);
-  taskContainer.replaceChildren(...overdueTaskNodes, ...pendingTaskNodes);
-});
-
-let completedTab = document.querySelector("button#completed");
-completedTab.addEventListener("click", () => {
-  let completedTasks = window.getTasksWithStatus(1, window.tasks);
-  let taskNodes = makeTaskNodeArray(completedTasks);
-  taskContainer.replaceChildren(...taskNodes);
-});
-
-let todayTab = document.querySelector("button#today");
-todayTab.addEventListener("click", () => {
-  let today = window.getCurrentDate();
-  let todaysTasks = window.getTasksByDueDate([today], window.tasks);
-  let taskNodes = makeTaskNodeArray(todaysTasks);
-  taskContainer.replaceChildren(...taskNodes);
-});
 
 let introduction = document.querySelector("#introduction");
 if (localStorage.getItem("hide-intro")) {
@@ -172,14 +147,6 @@ let hideIntroductionBtn = introduction.querySelector(
 hideIntroductionBtn.addEventListener("click", () => {
   localStorage.setItem("hide-intro", true);
   introduction.remove();
-});
-
-let settingsTab = document.querySelector("button#settings");
-let settingsContainer = document.querySelector("#settings-container");
-let eraseAllDataBtn = document.querySelector("button#erase-all-data");
-settingsTab.addEventListener("click", () => {
-  taskContainer.replaceChildren(settingsContainer);
-  settingsContainer.classList.remove("hidden");
 });
 
 function checkForRegistration(object, array) {
@@ -209,8 +176,8 @@ function makeEditorClone(object = new window.Task({})) {
   let detailsInput = editorClone.querySelector("#details");
   detailsInput.value = object.details || "";
 
-  let dueDateInput = editorClone.querySelector("#dueDate");
-  dueDateInput.value = object.dueDate || "";
+  let dueDateInput = editorClone.querySelector("#due-date");
+  dueDateInput.value = object["due date"] || "";
 
   let tagsInput = editorClone.querySelector("#tags");
   tagsInput.value = object.tags.join(" ");
@@ -358,9 +325,9 @@ function makeEditorClone(object = new window.Task({})) {
       object.details = detailsInput.value;
     }
     if (dueDateInput.value === "") {
-      delete object.dueDate;
+      delete object["due date"];
     } else {
-      object.dueDate = dueDateInput.value;
+      object["due date"] = dueDateInput.value;
     }
     if (tagsInput.value === "") {
       object.tags = [];
@@ -382,14 +349,15 @@ function makeEditorClone(object = new window.Task({})) {
     let report = false;
     inputElements.forEach((input) => {
       let taskPropertyValue;
-      if (input.id === "tags") {
+      let property = input.id.replaceAll("-", " ");
+      if (property === "tags") {
         taskPropertyValue = object.tags.join(" ");
       } else {
-        taskPropertyValue = object[input.id];
+        taskPropertyValue = object[property];
       }
       if (
         (input.value !== taskPropertyValue) &
-        !(input.value === "" && object[input.id] === undefined)
+        !(input.value === "" && object[property] === undefined)
       ) {
         report = true;
       }
@@ -422,8 +390,7 @@ function makeEditorClone(object = new window.Task({})) {
   return editorClone;
 }
 
-let writeTaskBtn = document.querySelector("button#write-task");
-writeTaskBtn.addEventListener("click", () => {
+document.querySelector("button#write-task").addEventListener("click", () => {
   let editor = makeEditorClone();
   let completedTask = Array.from(taskContainer.children).find((task) => {
     return task.classList.contains("complete");
@@ -445,35 +412,3 @@ function updateStorageQuotaText() {
 }
 
 updateStorageQuotaText();
-
-let tabBtns = document.querySelectorAll(".tabs>button");
-let tabBar = document.querySelector(".tabs");
-tabBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    if (btn.id === "settings") {
-      writeTaskBtn.classList.add("hidden");
-    } else {
-      writeTaskBtn.classList.remove("hidden");
-    }
-    let selectedTab = tabBar.querySelector(".selected");
-    if (selectedTab) {
-      selectedTab.classList.remove("selected");
-    }
-    btn.classList.add("selected");
-    localStorage.setItem("lastTab", btn.id);
-  });
-});
-
-if (Object.hasOwn(localStorage, "lastTab")) {
-  document.getElementById(localStorage.getItem("lastTab")).click();
-} else {
-  pendingTab.click();
-}
-
-eraseAllDataBtn.addEventListener("click", () => {
-  if (confirm("Are you sure you want to erase all user data?") === false) {
-    return;
-  }
-  localStorage.clear();
-  window.location.reload();
-});

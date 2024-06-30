@@ -6,132 +6,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="./index.css" type="text/css" rel="stylesheet">
     <script src="./task-app.js"></script>
+    <script src="./list-configuration.js"></script>
     <script src="./estimate-quota-usage.js"></script>
     <script src="./show-table.js"></script>
     <script>
       parseLocalStorageArray('tasks');
       parseLocalStorageArray('records');
-      console.log(`${tasks.length > 0 || records.length > 0 ? 'U': 'No u'}ser data has been found localStorage.`);
+      console.log(`${tasks.length > 0 || records.length > 0 ? 'U': 'No u'}ser data has been found in localStorage.`);
     </script>
-    <script defer src="./gui-opperations.js"></script>
+    <script defer src="./task-gui-opperations.js"></script>
+    <script defer src="./tab-gui-opperations.js"></script>
   </head>
   <body>
 
-    <div class="tabs flex row">
-      <button id="pending">pending</button>
-      <button id="today">today</button>
-      <button id="completed">completed</button>
-      <span class="flex-grow"></span>
-      <button id="settings">&ctdot;</button>
-    </div>
+      <div id="tab-container" class="flex row">
+        <span class="flex-grow spacer"></span>
+        <button id="settings">&ctdot;</button>
+      </div>
 
-    <div id="tab-options-container" class="flex column hidden">
+    <div id="tab-options-container" class="flex column">
       <div class="flex column">
         <label for="tab-name">tab name:</label>
-        <input type="text" placeholder="suggestion: keep it short">
+        <input id="tab-name" type="text">
       </div>
       <div class="flex column">
         <label for="tag-requirements">show tasks with the following tags:</label>
         <textarea id="tag-requirements"></textarea>
+        <div>
+          <span>tasks should contain:</span>
+          <span class="inline-block">
+            <input type="radio" name="tag-option" value="some tags" id="some-tags">
+            <label for="some-tags">at least one</label>
+          </span>
+          <span class="inline-block">
+            <input type="radio" name="tag-option" value="all tags" id="all-tags">
+            <label for="all-tags">all listed tags</label>
+          </span>
+          <span class="inline-block">
+            <input type="radio" name="tag-option" value="disregard tags" id="disregard-tags">
+            <label for="disregard-tags">any or none</label>
+          </span>
+          <span class="inline-block">
+            <input type="radio" name="tag-option" value="no tags" id="no-tags">
+            <label for="no-tags">no tags</label>
+          </span>
+        </div>
       </div>
 
-      <div class="flex row">
-        <span>each task should contain:</span>
-        <span class="input-container flex row">
-          <span class="dont-wrap-text">
-            <input type="radio" name="tag-match" value="all" id="tag-match-option-1" checked>
-            <label for="tag-match-option-1">all of these tags</label>
-          </span>
-          <span class="dont-wrap-text">
-            <input type="radio" name="tag-match" value="some" id="tag-match-option-2">
-            <label for="tag-match-option-2">at least one of these tags</label>
-          </span>
-        </span>
-      </div>
-
-      <details open>
-        <summary>filtering options</summary>
+      <details>
+        <summary>options for overdue tasks</summary>
         <div>
-          <div>filter tasks by <em>deadline</em></div>
-          <div>
-            <label for="due-date-range-start">from:</label>
-            <input type="date" id="due-date-range-start"></input>
-            <label for="due-date-range-end">to:</label>
-            <input type="date" id="due-date-range-end"></input>
-          </div>
+          <input type="checkbox" id="show-overdue" name="overdue">
+          <label for="show-overdue">show overdue tasks</label>
         </div>
-
         <div>
-          <div>filter tasks by <em>date of creation</em></div>
-          <div>
-            <label for="start-date-range-start">from:</label>
-            <input type="date" id="start-date-range-start"></input>
-            <label for="start-date-range-end">to:</label>
-            <input type="date" id"start-date-range-end"></input>
-          </div>
+          <input type="checkbox" id="finite-grace-period" value="false" name="endless-grace-period"/>
+          <label for="finite-grace-period">hide after a period of</label>
+          <input type="number" id="grace-period-length" value="1" min="1"/>
+          <span>day(s)</span>
+          <div class="sub-info">otherwise, continuously display overdue tasks</div>
         </div>
-
         <div>
-          <div>filter tasks by <em>date of completion</em></div>
-          <div>
-            <label for="end-date-range-start">from:</label>
-            <input type="date" id="end-date-range-start"></input>
-            <label for="end-date-range-end">to:</label>
-            <input type="date" id="end-date-range-end"></input>
-          </div>
-        </div>
-
-        <div>
-          <div>show tasks with status:</div>
-          <div>
-            <span>
-              <input type="checkbox" id="show-overdue" name="overdue">
-              <label for="show-overdue">overdue</label>
-            </span>
-            <span>
-              <input type="checkbox" id="show-pending" name="pending">
-              <label for="show-pending">pending</label>
-            </span>
-            <span>
-              <input type="checkbox" id="show-completed" name="complete">
-              <label for="show-completed">completed</label>
-            </span>
-          </div>
+          <span>sort overdue tasks by:</span>
+          <select id="overdue-sort-method">
+            <option value="due date">date of deadline</option>
+            <option value="start date">date of creation</option>
+          </select>
         </div>
       </details>
 
-      <details open>
-        <summary>sorting options</summary>
+      <details>
+        <summary>options for pending tasks</summary>
         <div>
-          <span>tasks are sorted by deadline by default(tasks with earliest due date first).
-          <div>
-            <input type="radio" value="due-date" name="sort-by" id="sort-option-1" checked>
-            <label for="sort-option-1">sort tasks by date of deadline</label>
-          </div>
-          <div>
-            <input type="radio" value="start-date" name="sort-by" id="sort-option-2">
-            <label for="sort-option-2">sort tasks by date of creation</label>
-          </div>
-          <div>
-            <input type="radio" value="tags" name="sort-by" id="sort-option-3">
-            <label for="sort-option-3">sort tasks by tag quantity</label>
-          </div>
+          <input type="checkbox" id="show-pending" name="pending">
+          <label for="show-pending">show pending tasks</label>
         </div>
         <div>
-          <input type="checkbox" id="reverse-order-option" name="reverse-order">
-          <label for="reverse-order-option">reverse the sort order</label>
+          <input type="checkbox" id="filter-pending" name="pending-date-range"/>
+          <label for="filter-pending">display tasks for the next</label>
+          <input type="number" id="number-of-days" min="1" value="1"/>
+          <span>day(s)</span>
+          <div class="sub-info">( 1 = today only; tasks without a deadline will always be displayed )</div>
+        </div>
+        <div>
+          <span>sort pending tasks by:</span>
+          <select id="pending-sort-method">
+            <option value="due date">date of deadline</option>
+            <option value="start date">date of creation</option>
+          </select>
+        </div>
+      </details>
+
+      <details>
+        <summary>options for completed tasks</summary>
+        <div>
+          <input type="checkbox" id="show-completed" name="complete">
+          <label for="show-completed">show completed tasks</label>
+        </div>
+        <div>
+          <input type="checkbox" id="date-range" name="date-range-option"/>
+          <label for="date-range">display tasks from based on</label>
+          <select id="date-property">
+            <option value="due date">date of deadline</option>
+            <option value="start date">date of creation</option>
+            <option value="end date">date of completion</option>
+          </select>
+          <div class="indent">
+            <span class="inline-block">
+              <label for="date-range-start">from:</label>
+              <input type="date" id="date-range-start"></input>
+            </span>
+            <span class="inline-block">
+              <label for="date-range-end">to:</label>
+              <input type="date" id="date-range-end"></input>
+            </span>
+          </div>
+          <div class="sub-info">tasks without the selected date property will not be displayed</div>
+        </div>
+        <div>
+          <span>sort completed tasks by:</span>
+          <select id="completed-sort-method">
+            <option value="due date">date of deadline</option>
+            <option value="start date">date of creation</option>
+            <option value="end date">date of completion</option>
+          </select>
         </div>
       </details>
 
       <div>
-        <input type="checkbox" id="archive-completed">
-        <label for="archive-completed">automatically archive completed tasks</label>
+        <button id="remove-tab">remove</button>
+        <button id="save-config">save configuration and apply changes</button>
       </div>
     </div>
 
     <div id="task-container">
       <div id="task-node-template" class='task-node-template hidden'>
-        <details open>
+        <details>
           <summary class="task-title">
             move those dang buttons out of the template... and for development purposes, i will have to make this title very verbose and extra large
           </summary>
@@ -180,8 +190,8 @@
           <textarea id="tags" spellcheck="false" placeholder="join-words-with-dash separate-tags-with-space"></textarea>
         </div>
         <div class="date-input-container">
-            <label for="dueDate">due date:</label>
-            <input id="dueDate"type="date"></input>
+            <label for="due-date">due date:</label>
+            <input id="due-date"type="date"></input>
         </div>
 
         <div class="prerequisite-container">
@@ -236,28 +246,43 @@
             <p>date format?</p>
           </div>
         </details>
+
+        <details>
+          <summary><strong>tab options</strong></summary>
+          <div>
+            <p>Tabs of the same name are not permitted.</p>
+            <button id="add-tab">add a configurable tab</button>
+            <button id="add-pending">add a tab for pending tasks</button>
+            <button id="add-today">add a tab for current day tasks</button>
+            <button id="add-completed">add a tab for completed tasks</button>
+          </div>
+        </details>
+
         <details id="reset-data">
           <summary><strong>user data options</strong></summary>
           <div>
-            <p>To erase all data such as tasks, tabs and prefferred settings: press the red button and confirm your choice.</p>
+            <p>To erase all data such as tasks, tabs and prefferred settings: press the maroon button and confirm your choice.</p>
             <button id="erase-all-data">ERASE ALL DATA</button>
           </div>
         </details>
+
         <details>
-          <summary>app info</summary>
+          <summary><strong>app info</strong></summary>
           <div>
+            <p>This project is developed by an autodidact web developer who still has much to learn.</p>
             <p>There are more features to be implemented to the graphical user interface.<p>
-            <p>For those who know JS: the <a href="./fn-table.html">core functionality</a> is available through the browser console.</p>
+            <p>For those who know JS and would like to try the barebones version without the gui: the <a href="./fn-table.html">core functionality</a> is available through the browser console.</p>
             <p>You can follow the development of this app by watching <a href="https://github.com/syrupsandwich/task-app">the github repository</a>.</p>
             <p>If you find any problems and know how to replicate it, let me know through the <a href="https://github.com/syrupsandwich/task-app/issues">issues page</a> on github.</p>
             <p id="copywrite">Task App &copy; 2024 Saul Lopez</p>
           </div>
         </details>
       </div>
+
     </div>
 
-    <div id="write-task-button-container">
-      <button id="write-task" class="hidden">write new task</button>
+    <div id="write-task-button-container" class="flex row">
+      <button id="write-task">write new task</button>
     </div>
 
     <footer>
@@ -266,7 +291,7 @@
     <div id="introduction" class="flex">
       <div>
         <h3>This is Task App</h3>
-        <p>A web application that can save your tasks and display them as a list.</p>
+        <p>A web application that stores your tasks and displays as a list.</p>
         <p>You can follow the development of this app by watching <a href="https://github.com/syrupsandwich/task-app">the github repository</a></p>
         <p>If you find any problems and know how to replicate it, let me know through the <a href="https://github.com/syrupsandwich/task-app/issues">issues page</a> on github.</p>
         <p>Thank you for checking out this project.</p>

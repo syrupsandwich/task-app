@@ -24,13 +24,29 @@ function parseLocalStorageArray(key) {
   }
 }
 
-function getCurrentDate() {
-  let date = new Date();
+function formatDate(date) {
   let year = date.getFullYear();
   let month = `${date.getMonth() + 1}`.padStart(2, "0");
   let dayOfMonth = `${date.getDate()}`.padStart(2, "0");
   let string = `${year}-${month}-${dayOfMonth}`;
   return string;
+}
+
+function getCurrentDate() {
+  let date = new Date();
+  return formatDate(date);
+}
+
+/* exported shiftDate */
+function shiftDate(date, days, operator) {
+  let result = new Date(date + "T00:00:00");
+  if (operator === "add") {
+    result.setDate(result.getDate() + Number(days));
+  }
+  if (operator === "subtract") {
+    result.setDate(result.getDate() - Number(days));
+  }
+  return formatDate(result);
 }
 
 function Task(object) {
@@ -47,30 +63,36 @@ function Task(object) {
   });
   this.title = object.title;
   this.details = object.details;
-  if (Object.hasOwn(object, "startDate")) {
-    this.startDate = object.startDate;
+  if (Object.hasOwn(object, "start date")) {
+    this["start date"] = object["start date"];
   } else {
-    this.startDate = getCurrentDate();
+    this["start date"] = getCurrentDate();
   }
-  this.dueDate = object.dueDate;
+  if (Object.hasOwn(object, "due date")) {
+    this["due date"] = object["due date"];
+  }
   if (Object.hasOwn(object, "tags")) {
     this.tags = object.tags;
   } else {
     this.tags = [];
   }
-  if (Object.hasOwn(object, "isComplete")) {
-    this.isComplete = object.isComplete;
-  } else {
-    this.isComplete = false;
-  }
-  if (Object.hasOwn(object, "endDate")) {
-    this.endDate = object.endDate;
+  if (Object.hasOwn(object, "end date")) {
+    this["end date"] = object["end date"];
   }
   if (Object.hasOwn(object, "requiredTaskIds")) {
     this.requiredTaskIds = object.requiredTaskIds;
   } else {
     this.requiredTaskIds = [];
   }
+  Object.defineProperty(this, "isComplete", {
+    get: function () {
+      if (Object.hasOwn(this, "end date")) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  });
   Object.defineProperty(this, "dependentTaskIds", {
     get: function () {
       let ids = [];
@@ -103,10 +125,10 @@ Task.prototype.getStatus = function () {
   if (this.isComplete) {
     return complete;
   }
-  if (this.dueDate === undefined) {
+  if (this["due date"] === undefined) {
     return incomplete;
   }
-  if (checkDateHasPassed(this.dueDate)) {
+  if (checkDateHasPassed(this["due date"])) {
     return overdue;
   }
   return incomplete;
@@ -147,7 +169,7 @@ function writeTask(object) {
 }
 
 /* exported getTasksWithTags */
-function getTasksWithTags(strings, array = tasks) {
+function getTasksWithTags(strings, array = tasks, containsAll = true) {
   let searchResults = array.filter((task) => {
     let score = 0;
     task.tags.forEach((tag) => {
@@ -155,10 +177,10 @@ function getTasksWithTags(strings, array = tasks) {
         score++;
       }
     });
-    if (score === strings.length) {
-      return true;
+    if (containsAll) {
+      return score === strings.length;
     } else {
-      return false;
+      return score >= 1;
     }
   });
   return searchResults;
@@ -180,16 +202,14 @@ function getTasks(ids, array = tasks) {
 }
 
 /* exported markTasksAsComplete */
-function markTasksAsComplete(ids, isComplete = true) {
+function markTasksAsComplete(ids, completed = true) {
   ids.forEach((id) => {
     let task = getTasks([id])[0];
-    if (isComplete) {
-      task.isComplete = true;
-      task.endDate = getCurrentDate();
+    if (completed) {
+      task["end date"] = getCurrentDate();
       return;
     } else {
-      task.isComplete = false;
-      delete task.endDate;
+      delete task["end date"];
       return;
     }
   });
@@ -223,24 +243,21 @@ function sortTasksByTags(strings, array) {
   });
 }
 
-/* exported sortTasksByStartDate */
-function sortTasksByStartDate(array, chronological = true) {
+/* exported sortTasksByDate */
+function sortTasksByDate(array, dateProperty, chronological = true) {
   return array.toSorted((a, b) => {
-    if (chronological) {
-      return a.startDate - b.startdate;
-    } else {
-      return b.startDate - a.stardDate;
+    if (Object.hasOwn(a, dateProperty) === false) {
+      return 1;
     }
-  });
-}
-
-/* exported sortTasksByDueDate */
-function sortTasksByDueDate(array, chronological = true) {
-  return array.toSorted((a, b) => {
+    if (Object.hasOwn(b, dateProperty) === false) {
+      return -1;
+    }
+    let dateA = Number(a[dateProperty].replaceAll("-", ""));
+    let dateB = Number(b[dateProperty].replaceAll("-", ""));
     if (chronological) {
-      return a.dueDate - b.dueDate;
+      return dateA - dateB;
     } else {
-      return b.dueDate - a.dueDate;
+      return dateB - dateA;
     }
   });
 }
@@ -273,29 +290,15 @@ function getTasksWithText(strings, array = tasks) {
   return results;
 }
 
-/* exported getTasksByDueDate */
-function getTasksByDueDate(dateRange, array = tasks) {
+/* exported getTasksWithinDateRange */
+function getTasksWithinDateRange(dateProperty, dateRange, array = tasks) {
   let rangeStart = dateRange[0];
   let rangeEnd = dateRange[1];
   if (rangeEnd === undefined) {
     rangeEnd = rangeStart;
   }
   let results = array.filter((task) => {
-    let date = task.dueDate;
-    return date >= rangeStart && date <= rangeEnd;
-  });
-  return results;
-}
-
-/* exported getTasksByStartDate */
-function getTasksByStartDate(dateRange, array = tasks) {
-  let rangeStart = dateRange[0];
-  let rangeEnd = dateRange[1];
-  if (rangeEnd === undefined) {
-    rangeEnd = rangeStart;
-  }
-  let results = array.filter((task) => {
-    let date = task.startDate;
+    let date = task[dateProperty];
     return date >= rangeStart && date <= rangeEnd;
   });
   return results;
@@ -340,11 +343,10 @@ let minimalTaskObjKeys = [
   "id",
   "title",
   "details",
-  "dueDate",
-  "startDate",
-  "endDate",
+  "due date",
+  "start date",
+  "end date",
   "tags",
-  "isComplete",
   "requiredTaskIds",
 ];
 
@@ -354,4 +356,15 @@ function archiveTasks(array) {
     let removedTask = removeTasks([task.id])[0];
     window.records.push(removedTask);
   });
+}
+
+/* exported getTasksWithNoDueDate */
+function getTasksWithNoDueDate(array = tasks) {
+  let tasksWithoutDeadline = [];
+  array.forEach((task) => {
+    if (Object.hasOwn(task, "due date") === false) {
+      tasksWithoutDeadline.push(task);
+    }
+  });
+  return tasksWithoutDeadline;
 }

@@ -56,7 +56,7 @@
       </tr>
       <tr>
         <td>markTasksAsCompleted</td>
-        <td>ids, isComplete</td>
+        <td>ids, completed</td>
         <td>sets the isCompleted property to true(default) or false for each id's corresponding task</td>
         <td>1</td>
       </tr>
@@ -85,9 +85,9 @@
         <td>1</td>
       </tr>
       <tr>
-        <td>getTasksByDueDate</td>
-        <td>dateRange, array</td>
-        <td>returns an array of task objects which are due within the date range provided</td>
+        <td>getTasksWithinDateRange</td>
+        <td>dateProperty, dateRange, array</td>
+        <td>returns an array of task objects in which a date property value falls within the date range</td>
         <td>1</td>
       </tr>
       <tr>
@@ -97,9 +97,9 @@
         <td>1</td>
       </tr>
       <tr>
-        <td>sortTasksByDueDate</td>
-        <td>array, chronological</td>
-        <td>returns an array sorted based on the date a task is due</td>
+        <td>getTasksWithNoDueDate</td>
+        <td>array</td>
+        <td>returns an array of tasks with no "due date" property</td>
         <td>2</td>
       </tr>
       <tr>
@@ -112,18 +112,6 @@
         <td>sortTasksByTags</td>
         <td>strings, array</td>
         <td>returns an array sorted based on the amount of tags that match the strings</td>
-        <td>3</td>
-      </tr>
-      <tr>
-        <td>sortTasksByStartDate</td>
-        <td>array, chronological</td>
-        <td>returns an array sorted based on date of task creation</td>
-        <td>3</td>
-      </tr>
-      <tr>
-        <td>getTasksByStartDate</td>
-        <td>dateRange, array</td>
-        <td>returns an array of task objects which were created within the date range provided</td>
         <td>3</td>
       </tr>
       <tr>

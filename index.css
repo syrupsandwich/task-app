@@ -19,52 +19,62 @@ html{
 body{
   margin: 0;
   display: grid;
-  grid-template-columns: clamp(30ch, 94vw, 80ch);
+  grid-template-columns: clamp(40ch, 100%, 80ch);
   grid-template-rows: max-content auto 1fr max-content max-content;
-  height: 100%;
+  height: calc(100% - 2ch);
   justify-content: center;
+  padding: 1ch;
 }
 
 a{
   color: var(--pale-pumpkin);
 }
 
-.tabs{
+#tab-container{
   grid-area: 1 / 1 / 2 / 2;
-  border-left: 1px solid gray;
-  border-right: 1px solid gray;
-  margin-top: 1ch;
   padding-bottom: 1ch;
   overflow-x: auto;
   position: relative;
+  border-left: 1px solid gray;
+  border-right: 1px solid gray;
 }
 
-.tabs>button{
-  border-left: none;
+#tab-container>button{
+  margin-left: -1px;
   position: relative;
+  font-size: medium;
+}
+
+#tab-container>span:first-child{
+  display: none;
 }
 
 .flex-grow{
   flex-grow: 1;
 }
 
-.tabs>span.flex-grow{
+#tab-container>span{
   border-bottom: 1px solid gray;
+  background-color: var(--main-color);
 }
 
-.tabs>button.selected{
+#tab-container>button.selected{
   border-bottom-color: transparent;
   padding: 1ch 3ch 0ch;
 }
 
-button#settings{
-  border-left: 1px solid gray;
-  border-right: none;
+#tab-container>button#settings{
   justify-self: end;
   position: sticky;
   right: 0;
+  border-right: none;
   background-color: var(--main-color);
   font-weight: bold;
+}
+
+#tab-container>button#settings:only-of-type{
+  flex-grow: 1;
+  border-left: none;
 }
 
 select{
@@ -74,15 +84,59 @@ select{
 }
 
 #tab-options-container{
-  font-size: small;
+  font-size: medium;
   grid-area: 2 / 1 / 3 / 2;
   border-left: 1px solid gray;
   border-right: 1px solid gray;
-  padding: 2ch 2ch 3ch;
   gap: 3ch;
+  max-height: 70ch; 
+  overflow-y: auto;
+  position: relative;
+}
+
+#tab-options-container>*{
+  padding: 0 2ch;
+}
+
+#tab-options-container>div:first-child{
+  padding-top: 2ch;
+}
+#tab-options-container>div:last-child{
+  position: sticky;
+  bottom: 0;
+  background: var(--main-color);
+  padding: 1ch 2ch;
+  border-top: 1px solid var(--darker-gray)
+}
+
+label[for="tab-name"]{
+}
+
+input#tab-name{
+  font-size: medium;
+}
+
+#tab-options-container input[type="number"]{
+  width: 7ch;
+}
+
+#tab-options-container>details>div:first-of-type{
+  margin-top: 1ch;
+}
+
+#tab-options-container>details>div{
+  margin-bottom: -1px;
+  border: 1px solid var(--darker-gray);
+  padding: 2ch 1ch;
+  font-size: small;
+}
+
+#tab-options-container>details>div.nested-radio-option{
+  gap: .8ch;
 }
 
 #task-container{
+  position: relative;
   grid-area: 3 / 1 / 4 / 2;
   padding: 1ch;
   background-color: var(--darkened);
@@ -200,7 +254,8 @@ textarea#tags{
 }
 
 textarea,
-input[type="search"]{
+input[type="search"],
+input[type="text"]{
   padding: .4ch .8ch;
 }
 
@@ -313,8 +368,8 @@ select{
   grid-area: 4 / 1 / 5 / 2;
   border: 1px solid gray;
   border-top: none;
-  padding-top: 1ch;
-  margin-bottom: 1ch;
+  margin-top: -1px;
+  justify-content: center;
 }
 
 footer{
@@ -339,16 +394,15 @@ button:active{
   background-color: var(--darker-gray);
 }
 
-.tabs>button,
+#tab-container>button,
 #write-task{
   color: silver;
   border-color: gray;
 }
 
 #write-task{
-  margin: -1px;
-  margin-top: none;
-  width: calc(100% + 2px);
+  font-size: medium;
+  border: none;
 }
 
 button:disabled{
@@ -370,22 +424,25 @@ input#task-search{
   width: 100%;
 }
 
-#introduction{
-  font-size: small;
-}
-
 #settings-container{
-  font-size: small;
+  font-size: medium;
   position: relative;
+  padding: 1ch;
 }
 
 #settings-container>details{
-  margin-top: 2ch;
   margin-bottom: 4ch;
 }
 
 #settings-container>details>div{
-  padding-left: 2ch;
+  padding: .4ch 2ch;
+}
+
+button#erase-all-data{
+  background: maroon;
+  border: 3px ridge maroon;
+  color: white;
+  letter-spacing: 1px;
 }
 
 #copywrite{
@@ -395,20 +452,58 @@ input#task-search{
 
 #introduction{
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 2ch);
+  height: calc(100% - 2ch);
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(4px);
+  background-color: var(--main-color);
 }
 
 #introduction>div{
   background: var(--darkened);
-  padding: 4ch 6ch;
-  margin: 1ch 2ch;
+  padding: 2ch 3ch;
 }
 
 button#hide-introduction{
   width: 100%;
   margin-top: 3ch;
+}
+
+select:disabled,
+input:disabled,
+textarea:disabled{
+  color: gray;
+}
+
+input[type="number"]#days-before,
+input[type="number"]#days-after{
+  width: 7ch;
+}
+
+.indent{
+  padding-left: 4ch;
+}
+
+.sub-info{
+  margin-left: 1ch;
+  margin-top: .4ch;
+  opacity: 70%;
+}
+
+.inline-block{
+  display: inline-block;
+}
+
+button#add-tab,
+button#add-pending,
+button#add-today,
+button#add-completed{
+  font-size: small;
+  color: silver;
+  margin-bottom: 1ch;
+  display: block;
+}
+
+input[type="date"]{
+  min-width: 15.2ch;
 }
